@@ -8,10 +8,11 @@ const PORT = process.env.port;
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-const loanRouter = require("./farmerLoan");
 const dashboardRouter = require("./vendorDashboard");
+const inventoryRouter = require("./vendorInventory");
 
 app.use("/dashboard", dashboardRouter);
+app.use("/inventory", inventoryRouter);
 
 
 app.listen(PORT, async () => {

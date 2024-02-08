@@ -1,6 +1,7 @@
 const supabase = require("./db.js");
 const router = require("express").Router();
 
+
 async function processSellHistoryData(sellHistoryData) {
   const monthName = [
     "Jan",
@@ -75,7 +76,10 @@ async function processSellHistoryData(sellHistoryData) {
         // month_no is present in the sellHistoryData
         found = true;
         sellHistoryDataReturned.push({
-          month: monthName[month_no - 1] + "-" + monthYears[last12MonthsIndex].toString().slice(2),
+          month:
+            monthName[month_no - 1] +
+            "-" +
+            monthYears[last12MonthsIndex].toString().slice(2),
           amount:
             parseFloat(sellHistoryData[sellHistoryDataIndex].total) -
             parseFloat(sellHistoryData[sellHistoryDataIndex].totaldeduction) -
@@ -89,7 +93,10 @@ async function processSellHistoryData(sellHistoryData) {
     // if the month_no is not present in the sellHistoryData, add the month_no with 0 amount
     if (!found) {
       sellHistoryDataReturned.push({
-        month: monthName[month_no - 1] + "-" + monthYears[last12MonthsIndex].toString().slice(2),
+        month:
+          monthName[month_no - 1] +
+          "-" +
+          monthYears[last12MonthsIndex].toString().slice(2),
         amount: 0,
       });
     }
@@ -103,13 +110,16 @@ async function processSellHistoryData(sellHistoryData) {
 
 router.post("/", async (req, res) => {
   console.log("Holla bro");
+  console.log(req.body.id);
   let response = await supabase.any(
     `SELECT "name", "nid", "email", "phone", "avatarLink", "permanentAddress",  "dob",  (SELECT "name" AS "unionName" FROM "UnionParishad" where "UnionParishad"."id" = "unionId"), \
-        (SELECT "name" AS "agentName" FROM "User" where "id" = (SELECT "agentId" FROM "Farmer" where "Farmer"."id" = $1)) \
-        FROM "User" where "id" = $1;`,
+    (SELECT "name" AS "agentName" FROM "User" where "id" = (SELECT "agentId" FROM "Vendor" where "Vendor"."id" = $1)) \
+    FROM "User" where "id" = $1;`,
     [req.body.id]
   );
   const basicData = response[0];
+
+  console.log(basicData);
   let rankandpointArray = await supabase.any(
     `SELECT "rank", "points" FROM "Vendor" where "Vendor"."id" = $1;`,
     [req.body.id]
@@ -117,10 +127,17 @@ router.post("/", async (req, res) => {
 
   let rankandpoint = rankandpointArray[0];
 
+  console.log(rankandpoint);
+
   // populate data table for next rank point point reaching
   let rankTable = await supabase.any(
-    `SELECT "className", "max", "min" FROM "Rank"`
+    `SELECT "className", "max", "min", "nextRank" FROM "Rank" where "Rank"."className" = $1`,
+    [rankandpoint.rank]
   );
+
+  rankandpoint.minPoint = rankTable[0].min;
+  rankandpoint.maxPoint = rankTable[0].max;
+  rankandpoint.nextRank = rankTable[0].nextRank;
 
   let buyHistoryData = await supabase.any(
     `SELECT EXTRACT('MONTH' FROM "timestamp") AS month_no, SUM("total") as total, SUM("cashback") as totalCashback \
@@ -132,7 +149,7 @@ router.post("/", async (req, res) => {
 
   console.log(buyHistoryData);
 
-  let buyHistoryOneYear = await processSellHistoryData(sellHistoryData);
+  let buyHistoryOneYear = await processSellHistoryData(buyHistoryData);
   const responseObj = { basicData, rankandpoint, buyHistoryOneYear };
 
   console.log(responseObj);
