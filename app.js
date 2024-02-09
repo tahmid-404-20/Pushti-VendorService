@@ -10,9 +10,11 @@ app.use(cors({ origin: "*" }));
 
 const dashboardRouter = require("./vendorDashboard");
 const inventoryRouter = require("./vendorInventory");
+const sellRouter = require("./vendorTransactions");
 
 app.use("/dashboard", dashboardRouter);
 app.use("/inventory", inventoryRouter);
+app.use("/sell", sellRouter);
 
 
 app.listen(PORT, async () => {
