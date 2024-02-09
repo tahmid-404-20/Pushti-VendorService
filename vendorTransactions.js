@@ -28,6 +28,7 @@ async function getSellMsUrl() {
 router.post("/history", async (req, res) => {
     const sellMsUrl = await getSellMsUrl();
     const historyUrl = sellMsUrl + "/sell-history/vendor";
+    console.log(historyUrl);
     const req_data = { vendor_id: req.body.id};
     try {
         const response = await axios.post(historyUrl, req_data);
