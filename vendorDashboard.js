@@ -82,8 +82,6 @@ async function processSellHistoryData(sellHistoryData) {
             monthYears[last12MonthsIndex].toString().slice(2),
           amount:
             parseFloat(sellHistoryData[sellHistoryDataIndex].total) -
-            parseFloat(sellHistoryData[sellHistoryDataIndex].totaldeduction) -
-            parseFloat(sellHistoryData[sellHistoryDataIndex].taxamount) +
             parseFloat(sellHistoryData[sellHistoryDataIndex].totalcashback),
         });
         break;
