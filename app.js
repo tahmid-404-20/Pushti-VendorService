@@ -12,11 +12,13 @@ const dashboardRouter = require("./vendorDashboard");
 const inventoryRouter = require("./vendorInventory");
 const sellRouter = require("./vendorTransactions");
 const leaderboardRouter = require("./vendorLeaderboard");
+const supportRouter = require("./vendorSupport");
 
 app.use("/dashboard", dashboardRouter);
 app.use("/inventory", inventoryRouter);
 app.use("/sell", sellRouter);
 app.use("/leaderboard", leaderboardRouter);
+app.use("/support", supportRouter);
 
 
 app.listen(PORT, async () => {
